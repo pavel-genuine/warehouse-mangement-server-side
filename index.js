@@ -32,7 +32,7 @@ async function run(){
     res.send(allGadgets)
     })
 
-    app.get('/inventoy/:id', async (req,res)=>{
+    app.get('/inventory/:id', async (req,res)=>{
       const id = req.params.id
       const query ={_id:ObjectId(id)}
     
@@ -45,6 +45,13 @@ async function run(){
       const result = await gadgetsCollection.insertOne(newGadget);
       res.send(result)
     })
+
+    app.delete('/inventory/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id)};
+      const result = await gearsCollection.deleteOne(query);
+      res.send(result);
+  })
 
 
 
