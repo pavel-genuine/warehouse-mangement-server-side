@@ -49,8 +49,23 @@ async function run(){
     app.delete('/inventory/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id)};
-      const result = await gearsCollection.deleteOne(query);
+      const result = await gadgetsCollection.deleteOne(query);
       res.send(result);
+  })
+
+  app.put('/inventory/:id', async(req, res) =>{
+    const id = req.params.id;
+    const gadget = req.body;
+    const filter = {_id: ObjectId(id)};
+    const options = { upsert: true };
+    const updatedDoc = {
+        $set: {
+          quantity: gadget.quantity,
+        }
+    };
+    const result = await gadgetsCollection.updateOne(filter, updatedDoc, options);
+    res.send(result);
+  
   })
 
 
