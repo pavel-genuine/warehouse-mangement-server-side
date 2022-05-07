@@ -23,21 +23,21 @@ async function run(){
   try{
 
     await client.connect()
-    const gearsCollection = client.db('fashion-style').collection('gear')
+    const gadgetsCollection = client.db('GadgetArena').collection('Gadget')
     
-    app.get('/gear', async (req,res)=>{
+    app.get('/inventory', async (req,res)=>{
       const query ={}
-    const cursor = gearsCollection.find(query)
-    const allGears = await cursor.toArray()
-    res.send(allGears)
+    const cursor = gadgetsCollection.find(query)
+    const allGadgets = await cursor.toArray()
+    res.send(allGadgets)
     })
 
-    app.get('/gear/:id', async (req,res)=>{
+    app.get('/inventoy/:id', async (req,res)=>{
       const id = req.params.id
       const query ={_id:ObjectId(id)}
     
-      const singleGear = await gearsCollection.findOne(query)
-      res.send(singleGear)
+      const singleGadget = await gadgetsCollection.findOne(query)
+      res.send(singleGadget)
     })
 
 
