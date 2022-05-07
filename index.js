@@ -69,6 +69,18 @@ async function run(){
   })
 
 
+  app.get('/user-items', async (req, res) => {
+    const email = req.query.email;
+    
+        const query = { email: email };
+        const cursor = gadgetsCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+    
+   
+})
+
+
 
   }
   finally{
