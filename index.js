@@ -40,6 +40,12 @@ async function run(){
       res.send(singleGadget)
     })
 
+    app.post('/inventory', async (req,res)=>{
+      const newGadget = req.body;
+      const result = await gadgetsCollection.insertOne(newGadget);
+      res.send(result)
+    })
+
 
 
   }
