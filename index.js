@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const secretTicket ='shhh'
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -13,8 +15,23 @@ app.use(cors());
 app.use(express.json());
 
 
+function verifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+      return res.status(401).send({ message: 'unauthorized access' });
+  }
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token,secretTicket, (err, decoded) => {
+      if (err) {
+          return res.status(403).send({ message: 'Forbidden access' });
+      }
+      console.log('decoded', decoded);
+      req.decoded = decoded;
+      next();
+  })
+}
 
-const uri = "mongodb+srv://pavelahmad:FYUMGoCarwC24jIZ@cluster0.nhqu8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const uri = `mongodb+srv://pavelahmad:FYUMGoCarwC24jIZ@cluster0.nhqu8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
@@ -24,11 +41,20 @@ async function run(){
 
     await client.connect()
     const gadgetsCollection = client.db('GadgetArena').collection('Gadget')
+
+    app.post('/sign-in', async (req, res) => {
+      const user = req.body;
+      const accessToken = jwt.sign(user,secretTicket, {
+          expiresIn: '1d'
+      });
+      res.send({ accessToken });
+  })
     
     app.get('/inventory', async (req,res)=>{
       const query ={}
     const cursor = gadgetsCollection.find(query)
     const allGadgets = await cursor.toArray()
+    console.log(process.env);
     res.send(allGadgets)
     })
 
@@ -69,17 +95,20 @@ async function run(){
   })
 
 
-  app.get('/user-items', async (req, res) => {
+  app.get('/user-items', verifyJWT, async (req, res) => {
+    const decodedEmail = req.decoded.email;
     const email = req.query.email;
-    
+    if (email === decodedEmail) {
         const query = { email: email };
         const cursor = gadgetsCollection.find(query);
         const result = await cursor.toArray();
         res.send(result);
-    
-   
+    }
+    else{
+        res.status(403).send({message: 'forbidden access'})
+    }
 })
-
+    
 
 
   }
